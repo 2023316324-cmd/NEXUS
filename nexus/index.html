@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus IT | Assistência Técnica Especializada</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        nexus: {
+                            dark: '#0f172a', // Fundo principal
+                            card: '#1e293b', // Fundo dos cartões
+                            primary: '#3b82f6', // Azul principal
+                            accent: '#60a5fa', // Azul claro para hover
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .hero-bg {
+            background-image: linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.8)), url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+        }
+        /* Animation settings for smoother feel */
+        :root{
+            --anim-ease: cubic-bezier(.16,1,.3,1);
+            --anim-speed: .68s;
+            --anim-speed-slow: .92s;
+            --modal-speed: .36s;
+        }
+        /* --- Animações de entrada e scroll --- */
+          /* --> Reveal bottom-to-top (smoother, hardware-accelerated)
+              Use data-direction="left"|"right" to add a small horizontal offset */
+          .animate-on-scroll { opacity: 0; transform: translate3d(0,28px,0); transition: opacity var(--anim-speed) var(--anim-ease), transform var(--anim-speed) var(--anim-ease); will-change: transform, opacity; backface-visibility: hidden; }
+          .animate-on-scroll.in-view { opacity: 1; transform: translate3d(0,0,0); }
+
+          /* lateral offset combined with bottom-to-top reveal */
+          .animate-on-scroll[data-direction="left"] { transform: translate3d(-14px,28px,0); }
+          .animate-on-scroll[data-direction="right"] { transform: translate3d(14px,28px,0); }
+          .animate-on-scroll.in-view[data-direction="left"], .animate-on-scroll.in-view[data-direction="right"] { transform: translate3d(0,0,0); }
+
+        /* Accessibility: respect prefers-reduced-motion */
+        @media (prefers-reduced-motion: reduce) {
+            .animate-on-scroll, .animate-on-load { transition: none !important; opacity: 1 !important; transform: none !important; }
+        }
+
+        .animate-on-load { opacity: 0; transform: translate3d(0,12px,0) scale(.997); transition: opacity var(--anim-speed-slow) var(--anim-ease), transform var(--anim-speed-slow) var(--anim-ease); will-change: transform, opacity; }
+        .animate-on-load.visible { opacity: 1; transform: none; }
+
+        .member-card { transition: transform .28s var(--anim-ease), box-shadow .28s var(--anim-ease); position: relative; overflow:hidden; border-radius: 0.75rem; }
+        .member-card:hover { transform: translate3d(0,-6px,0); box-shadow: 0 14px 40px rgba(0,0,0,0.42); }
+        /* Member hero photo & footer (full vertical image) */
+        .member-photo { height: 28rem; position:relative; overflow:hidden; }
+        /* Ensure the image shows the full subject when possible (contain), but keep center crop fallback */
+        .member-photo img { width:100%; height:100%; object-fit:cover; object-position:center; display:block; transition: transform .34s var(--anim-ease), filter .28s var(--anim-ease); /* subtle scale/transition */ }
+        /* Chromatic treatment: strong desaturation + contrast, with warm overlay vignette to the right */
+        .member-photo img { filter: grayscale(.82) contrast(1.06) brightness(.86) saturate(.85); }
+        .member-card:hover .member-photo img { transform: scale(1.032); filter: grayscale(.42) contrast(1.06) brightness(.92) saturate(1.02); }
+        /* subtle vignette with warm tone on right to match design */
+        .member-photo::before { content:''; position:absolute; inset:0; pointer-events:none; background: radial-gradient(60% 60% at 75% 40%, rgba(255,74,18,0.20), rgba(255,74,18,0.12) 18%, rgba(255,74,18,0.06) 28%, rgba(0,0,0,0) 65%); mix-blend-mode: overlay; opacity:.9; z-index: 0; }
+        /* dark outer vignette */
+        .member-photo::after { content:''; position:absolute; inset:0; pointer-events:none; background: radial-gradient(70% 80% at 50% 50%, rgba(0,0,0,0) 30%, rgba(0,0,0,0.3) 65%, rgba(0,0,0,0.5) 100%); z-index: 0; }
+        .signature-overlay { position:absolute; left:1rem; bottom:6.6rem; opacity:.95; width:160px; max-width:45%; filter: drop-shadow(0 8px 20px rgba(0,0,0,.6)) grayscale(.18) contrast(1.02); transform: translateY(2px); z-index: 1; }
+        .member-footer { position:absolute; left:0; right:0; bottom:0; padding:1rem 1.25rem; background: linear-gradient(180deg, rgba(15,23,42,0.0) 0%, rgba(15,23,42,0.88) 100%); border-top: 1px solid rgba(255,255,255,0.02); border-bottom-left-radius: .75rem; border-bottom-right-radius: .75rem; backdrop-filter: blur(6px); z-index: 2; }
+        .member-footer .member-name { color: #578ad8; font-weight:700; }
+        .member-footer .member-role { color: #d1d5db; font-size:.9rem; }
+
+        /* Desktop tuning: slightly taller portraits on larger screens */
+        @media (min-width: 1024px) {
+            .member-photo { height: 32rem; }
+            .signature-overlay { bottom:7.2rem; width:180px; }
+            .photo-panel { height:36rem; }
+        }
+
+        /* Modal photo panel adjustments */
+        .photo-panel { display:block; position:relative; height: 28rem; }
+        #member-modal-photo { width:100%; height:100%; object-fit:cover; display:block; }
+        #member-modal-signature { position:absolute; left:1rem; bottom:3.6rem; width:220px; filter: drop-shadow(0 8px 22px rgba(0,0,0,.6)); }
+        /* match chromatic treatment inside modal (less desaturated on modal) */
+        #member-modal-photo { filter: grayscale(.74) contrast(1.04) brightness(.86) saturate(.85); transition: filter .3s var(--anim-ease), transform .3s var(--anim-ease); }
+        #member-modal-overlay #member-modal.open #member-modal-photo { transform: none; }
+        #member-modal-overlay #member-modal .photo-panel::before { content:''; position:absolute; inset:0; background: radial-gradient(60% 60% at 75% 40%, rgba(255,74,18,0.22), rgba(255,74,18,0.12) 18%, rgba(255,74,18,0.06) 28%, rgba(0,0,0,0) 65%); mix-blend-mode: overlay; pointer-events:none; }
+        #member-modal-overlay #member-modal .photo-panel::after { content:''; position:absolute; inset:0; background: radial-gradient(70% 80% at 50% 50%, rgba(0,0,0,0) 30%, rgba(0,0,0,0.35) 65%, rgba(0,0,0,0.6) 100%); pointer-events:none; }
+
+        /* Member photo viewer overlay */
+        #member-photo-viewer-overlay { position: fixed; inset: 0; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,0.92); z-index: 9999; }
+        #member-photo-viewer-overlay.hidden { display: none; }
+        #member-photo-viewer-img { max-height: 90vh; max-width: 100%; width:auto; height:auto; object-fit:contain; border-radius: .5rem; transform-origin: center center; }
+        .viewer-img-wrap { transform-origin: center center; transition: transform .12s ease; cursor: grab; }
+        .viewer-img-wrap:active { cursor: grabbing; }
+        #member-photo-viewer-close { position:absolute; right: 0.5rem; top: 0.5rem; font-size: 1.5rem; background: transparent; border: none; color: white; cursor: pointer; }
+        #member-photo-viewer-signature { position:absolute; left:1rem; bottom:3.6rem; width:220px; filter: drop-shadow(0 8px 22px rgba(0,0,0,.6)); }
+
+        /* Modal smooth transitions */
+        #member-modal { transform: translate3d(0,8px,0) scale(.98); opacity:0; transition: transform var(--modal-speed) var(--anim-ease), opacity var(--modal-speed) var(--anim-ease); }
+        #member-modal.open { transform: translate3d(0,0,0) scale(1); opacity:1; }
+        #service-modal { transform: translate3d(0,8px,0) scale(.98); opacity:0; transition: transform var(--modal-speed) var(--anim-ease), opacity var(--modal-speed) var(--anim-ease); }
+        #service-modal.open { transform: translate3d(0,0,0) scale(1); opacity:1; }
+
+        /* Contact form validation / toast styles */
+        .form-error { color: #71a8fb; font-size: .9rem; margin-top: .375rem; display: none; }
+        .has-error .form-error { display: block; }
+
+        .toast-container { position: fixed; top: 1rem; right: 1rem; z-index: 60; display:flex; flex-direction:column; gap:.5rem; }
+        .toast { background: linear-gradient(180deg,#16a34a,#059669); color: white; padding: .75rem 1rem; border-radius: .5rem; box-shadow: 0 6px 24px rgba(0,0,0,.4); display:flex; gap:.75rem; align-items:center; }
+        .toast button { background: rgba(255,255,255,0.12); border: none; color: white; padding: .4rem .6rem; border-radius: .375rem; cursor: pointer; }
+    </style>
+</head>
+<body class="bg-nexus-dark text-gray-100 antialiased selection:bg-nexus-primary selection:text-white">
+
+    <nav class="fixed w-full z-50 bg-nexus-dark/95 backdrop-blur border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer">
+                    <!-- Substitua 'logo.png' pelo arquivo da sua logo -->
+                    <a href="/" class="flex items-center gap-3">
+                        <!-- Responsivo: h-8 em mobile, h-10 em sm, h-12 em md+ -->
+                        <img src="n.png" alt="Logo da empresa" class="h-8 sm:h-10 md:h-12 w-auto object-contain" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');" />
+                        <!-- Texto de marca visível (branco) - altere se preferir outro comportamento responsivo -->
+                        <span class="font-bold text-xl tracking-wide text-white">NEXUS <span class="text-nexus-primary">IT</span></span>
+                        <!-- Texto adicional apenas para leitores de tela -->
+                        <span class="sr-only">Nexus IT Solutions</span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:flex space-x-8">
+                    <a href="#home" class="hover:text-nexus-primary transition-colors text-sm font-medium">Home</a>
+                    <a href="#sobre" class="hover:text-nexus-primary transition-colors text-sm font-medium">Sobre</a>
+                    <a href="#servicos" class="hover:text-nexus-primary transition-colors text-sm font-medium">Serviços</a>
+                    <a href="#contato" class="hover:text-nexus-primary transition-colors text-sm font-medium">Contato</a>
+                </div>
+
+                <div class="hidden md:block">
+                    <a href="#contato" class="bg-nexus-primary hover:bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all shadow-lg shadow-blue-500/20">
+                        Fale com Especialista
+                    </a>
+                </div>
+
+                <div class="md:hidden">
+                    <button class="text-gray-300 hover:text-white">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section id="home" class="hero-bg h-screen flex items-center justify-center pt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-nexus-primary uppercase bg-blue-900/30 rounded-full border border-blue-800 animate-on-load" data-delay="0">
+               Assistência Técnica 
+            </div>
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight animate-on-load" data-delay="120">
+                A assistência que <br>Cuida do seu <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-nexus-primary">Equipamento</span>
+                <span class="block mt-4 text-sm md:text-base text-gray-300 font-medium">Assistência técnica especializada — suporte proativo para manter sua operação.</span>
+            </h1>
+            <p class="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 animate-on-load" data-delay="220">
+                Soluções de TI avançadas, cibersegurança e infraestrutura em nuvem para empresas que não podem parar.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#servicos" class="bg-nexus-primary hover:bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-lg shadow-blue-500/30 animate-on-load" data-delay="320">
+                    Conhecer Soluções
+                </a>
+                <a href="#sobre" class="bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 px-8 py-4 rounded-lg text-lg font-semibold transition-all animate-on-load" data-delay="420">
+                    Sobre a Nexus
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team section: full width layout (moved outside the main container) -->
+  <section id="team" class="py-20 bg-nexus-dark">
+    <div class="px-5">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-8 text-left animate-on-scroll" data-delay="0">
+                <div class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Nosso Time</div>
+                <h2 class="text-4xl md:text-5xl font-extrabold text-blue-500 mb-2">
+                    Quem faz parte da Nexus
+                </h2>
+                <p class="text-gray-400">
+                    Pessoas criativas, obcecadas por clareza e resultado.
+                </p>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4">
+            <!-- GRID CORRIGIDA -->
+            <div class="relative grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 items-stretch">
+
+                <!-- IAGO -->
+                <div class="member-card bg-nexus-card rounded-xl border border-gray-800 animate-on-scroll cursor-pointer overflow-hidden" data-name="Iago Ariel" data-role="Gestor • Técnico em Informática" data-bio="Gestor de operações e técnico em informática. Lidera atendimentos, diagnóstico e coordenação de chamados com foco na experiência do cliente e qualidade do serviço." data-education="Técnico em Informática • IFRS - Campus Ibirubá" data-email="nexustinfo@gmail.com">
+                    <div class="member-photo">
+                        <img src="Imagens/IagoFT.jpeg" alt="Iago Ariel" class="w-full h-64 object-cover">
+                    </div>
+                    <div class="member-footer p-4">
+                        <div class="member-name font-bold text-nexus-primary">Iago Ariel</div>
+                        <div class="member-role text-sm text-gray-400">
+                            Gestor • Técnico em Informática
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FELIPE -->
+                <div class="member-card bg-nexus-card rounded-xl border border-gray-800 animate-on-scroll cursor-pointer overflow-hidden" data-name="Felipe" data-role="Social Media • Técnico em Informática" data-bio="Responsável por social media e suporte técnico. Atua em conteúdo, sites e atendimento ao usuário, com experiência em front‑end básico." data-education="Técnico em Informática • IFRS - Campus Ibirubá" data-email="nexustinfo@gmail.com">
+                    <div class="member-photo">
+                        <img src="Imagens/FelipeFT.jpeg" alt="Felipe" class="w-full h-64 object-cover">
+                    </div>
+                    <div class="member-footer p-4">
+                        <div class="member-name font-bold text-nexus-primary">Felipe</div>
+                        <div class="member-role text-sm text-gray-400">
+                            Social Media • Técnico em Informática
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GUSTAVO -->
+                <div class="member-card bg-nexus-card rounded-xl border border-gray-800 animate-on-scroll cursor-pointer overflow-hidden" data-name="Gustavo" data-role="Manutenção • Técnico em Informática" data-bio="Especialista em manutenção de computadores e dispositivos. Executa diagnóstico, upgrades e reparos visando performance e confiabilidade." data-education="Técnico em Informática • IFRS - Campus Ibirubá" data-email="nexustinfo@gmail.com">
+                    <div class="member-photo">
+                        <img src="Imagens/gustavoFT.jpeg" alt="Gustavo" class="w-full h-64 object-cover">
+                    </div>
+                    <div class="member-footer p-4">
+                        <div class="member-name font-bold text-nexus-primary">Gustavo</div>
+                        <div class="member-role text-sm text-gray-400">
+                            Manutenção • Técnico em Informática
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ENZO -->
+                <div class="member-card bg-nexus-card rounded-xl border border-gray-800 animate-on-scroll cursor-pointer overflow-hidden" data-name="Enzo" data-role="Manutenção • Técnico em Informática" data-bio="Técnico focado em manutenção e infraestrutura. Montagem, formatação, configuração de redes locais e otimização de hardware." data-education="Técnico em Informática • IFRS - Campus Ibirubá" data-email="nexustinfo@gmail.com">
+                    <div class="member-photo">
+                        <img src="Imagens/enzoFT.jpeg" alt="Enzo" class="w-full h-64 object-cover">
+                    </div>
+                    <div class="member-footer p-4">
+                        <div class="member-name font-bold text-nexus-primary">Enzo</div>
+                        <div class="member-role text-sm text-gray-400">
+                            Manutenção • Técnico em Informática
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DANIEL -->
+                <div class="member-card bg-nexus-card rounded-xl border border-gray-800 animate-on-scroll cursor-pointer overflow-hidden" data-name="Daniel" data-role="Programador • Técnico em Informática" data-bio="Programador com foco em mobile, APIs e bancos de dados. Desenvolve integrações e automações orientadas a resultado." data-education="Técnico em Informática • IFRS - Campus Ibirubá" data-email="nexustinfo@gmail.com">
+                    <div class="member-photo">
+                        <img src="Imagens/danielFT.jpeg" alt="Daniel" class="w-full h-64 object-cover">
+                    </div>
+                    <div class="member-footer p-4">
+                        <div class="member-name font-bold text-nexus-primary">Daniel</div>
+                        <div class="member-role text-sm text-gray-400">
+                            Programador • Técnico em Informática
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+    <section id="sobre" class="py-20 bg-nexus-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="prose prose-invert max-w-none">
+                <h2 class="text-nexus-primary font-bold tracking-wide uppercase text-sm mb-2">Quem Somos</h2>
+                <h3 class="text-3xl md:text-4xl font-bold mb-6">Parceiros estratégicos na sua jornada digital</h3>
+                <p class="text-gray-400 mb-6 leading-relaxed">
+                    Somos uma equipe de assistência técnica e desenvolvimento formada por profissionais e estudantes do IFRS – Campus Ibirubá. Atuamos com manutenção de computadores e dispositivos, além de projetos de software sob demanda (web, mobile, bancos de dados e APIs) para pessoas e pequenos negócios, com atendimento próximo, transparente e focado em resultado.
+                </p>
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-center gap-3">
+                        <i class="fa-solid fa-check-circle text-nexus-primary"></i>
+                        <span>Suporte técnico 24/7 humanizado</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i class="fa-solid fa-check-circle text-nexus-primary"></i>
+                        <span>Atendimento rápido e eficiente</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i class="fa-solid fa-check-circle text-nexus-primary"></i>
+                        <span>Qualidade e transparência no serviço</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="servicos" class="py-20 bg-gray-900/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Nossos Serviços</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Soluções completas em tecnologia, manutenção e desenvolvimento.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+                    <div class="service-card bg-nexus-card p-8 rounded-xl border border-gray-800 hover:border-nexus-primary transition-all hover:-translate-y-2 group animate-on-scroll" data-delay="0" role="button" tabindex="0" data-service-name="Manutenção de Computadores" data-service-desc="Manutenção preventiva e corretiva de computadores e notebooks, diagnóstico completo, upgrade de hardware e software." data-responsible-name="Enzo e Gustavo" data-responsible-email="nexustinfo@gmail.com" data-responsible-options="Enzo|nexustinfo@gmail.com;Gustavo|nexustinfo@gmail.com">
+                    <div class="w-14 h-14 bg-blue-900/50 rounded-lg flex items-center justify-center mb-6 group-hover:bg-nexus-primary transition-colors">
+                        <i class="fa-solid fa-desktop text-nexus-primary text-2xl group-hover:text-white"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">Manutenção de Computadores</h4>
+                    <p class="text-gray-400 text-sm mb-4">Manutenção preventiva e corretiva, diagnóstico completo e upgrade de hardware.</p>
+                    <button type="button" class="service-open text-nexus-primary text-sm font-semibold hover:text-white flex items-center gap-1">Saiba mais <i class="fa-solid fa-arrow-right text-xs"></i></button>
+                </div>
+
+                    <div class="service-card bg-nexus-card p-8 rounded-xl border border-gray-800 hover:border-nexus-primary transition-all hover:-translate-y-2 group animate-on-scroll" data-delay="100" role="button" tabindex="0" data-service-name="Desenvolvimento Web" data-service-desc="Criação de sites institucionais, e-commerce e aplicações web completas com tecnologias modernas e design responsivo." data-responsible-name="Felipe e Iago" data-responsible-email="nexustinfo@gmail.com" data-responsible-options="Felipe|nexustinfo@gmail.com;Iago|nexustinfo@gmail.com">
+                    <div class="w-14 h-14 bg-blue-900/50 rounded-lg flex items-center justify-center mb-6 group-hover:bg-nexus-primary transition-colors">
+                        <i class="fa-solid fa-globe text-nexus-primary text-2xl group-hover:text-white"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">Desenvolvimento Web</h4>
+                    <p class="text-gray-400 text-sm mb-4">Sites institucionais, e-commerce e aplicações web com design responsivo.</p>
+                    <button type="button" class="service-open text-nexus-primary text-sm font-semibold hover:text-white flex items-center gap-1">Saiba mais <i class="fa-solid fa-arrow-right text-xs"></i></button>
+                </div>
+
+                    <div class="service-card bg-nexus-card p-8 rounded-xl border border-gray-800 hover:border-nexus-primary transition-all hover:-translate-y-2 group animate-on-scroll" data-delay="200" role="button" tabindex="0" data-service-name="Desenvolvimento Mobile" data-service-desc="Aplicativos nativos e híbridos para Android e iOS, com foco em performance e experiência do usuário." data-responsible-name="Daniel e Iago" data-responsible-email="nexustinfo@gmail.com" data-responsible-options="Daniel|nexustinfo@gmail.com;Iago|nexustinfo@gmail.com">
+                    <div class="w-14 h-14 bg-blue-900/50 rounded-lg flex items-center justify-center mb-6 group-hover:bg-nexus-primary transition-colors">
+                        <i class="fa-solid fa-mobile-screen-button text-nexus-primary text-2xl group-hover:text-white"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">Desenvolvimento Mobile</h4>
+                    <p class="text-gray-400 text-sm mb-4">Apps para Android e iOS com foco em performance e experiência do usuário.</p>
+                    <button type="button" class="service-open text-nexus-primary text-sm font-semibold hover:text-white flex items-center gap-1">Saiba mais <i class="fa-solid fa-arrow-right text-xs"></i></button>
+                </div>
+
+                    <div class="service-card bg-nexus-card p-8 rounded-xl border border-gray-800 hover:border-nexus-primary transition-all hover:-translate-y-2 group animate-on-scroll" data-delay="300" role="button" tabindex="0" data-service-name="Desenvolvimento de Sistemas" data-service-desc="Sistemas personalizados para gestão empresarial, automação de processos e integração com APIs e bancos de dados." data-responsible-name="Felipe e Enzo" data-responsible-email="nexustinfo@gmail.com" data-responsible-options="Felipe|nexustinfo@gmail.com;Enzo|nexustinfo@gmail.com">
+                    <div class="w-14 h-14 bg-blue-900/50 rounded-lg flex items-center justify-center mb-6 group-hover:bg-nexus-primary transition-colors">
+                        <i class="fa-solid fa-laptop-code text-nexus-primary text-2xl group-hover:text-white"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">Desenvolvimento de Sistemas</h4>
+                    <p class="text-gray-400 text-sm mb-4">Sistemas personalizados para gestão empresarial e automação de processos.</p>
+                    <button type="button" class="service-open text-nexus-primary text-sm font-semibold hover:text-white flex items-center gap-1">Saiba mais <i class="fa-solid fa-arrow-right text-xs"></i></button>
+                </div>
+            </div>
+
+            <!-- Segunda linha centralizada com 3 cards -->
+            <div class="flex justify-center">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl">
+                    <div class="service-card bg-nexus-card p-8 rounded-xl border border-gray-800 hover:border-nexus-primary transition-all hover:-translate-y-2 group animate-on-scroll" data-delay="0" role="button" tabindex="0" data-service-name="Manutenção de Dispositivos" data-service-desc="Reparo e manutenção de smartphones, tablets, impressoras e outros dispositivos eletrônicos." data-responsible-name="Enzo e Gustavo" data-responsible-email="nexustinfo@gmail.com" data-responsible-options="Enzo|nexustinfo@gmail.com;Gustavo|nexustinfo@gmail.com">
+                    <div class="w-14 h-14 bg-blue-900/50 rounded-lg flex items-center justify-center mb-6 group-hover:bg-nexus-primary transition-colors">
+                        <i class="fa-solid fa-screwdriver-wrench text-nexus-primary text-2xl group-hover:text-white"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">Manutenção de Dispositivos</h4>
+                    <p class="text-gray-400 text-sm mb-4">Reparo de smartphones, tablets, impressoras e outros dispositivos eletrônicos.</p>
+                    <button type="button" class="service-open text-nexus-primary text-sm font-semibold hover:text-white flex items-center gap-1">Saiba mais <i class="fa-solid fa-arrow-right text-xs"></i></button>
+                </div>
+
+                    <div class="service-card bg-nexus-card p-8 rounded-xl border border-gray-800 hover:border-nexus-primary transition-all hover:-translate-y-2 group animate-on-scroll" data-delay="100" role="button" tabindex="0" data-service-name="Desenvolvimento de Banco de Dados" data-service-desc="Modelagem, criação e otimização de bancos de dados SQL e NoSQL para aplicações robustas e escaláveis." data-responsible-name="Daniel" data-responsible-email="nexustinfo@gmail.com" data-responsible-options="Daniel|nexustinfo@gmail.com">
+                    <div class="w-14 h-14 bg-blue-900/50 rounded-lg flex items-center justify-center mb-6 group-hover:bg-nexus-primary transition-colors">
+                        <i class="fa-solid fa-database text-nexus-primary text-2xl group-hover:text-white"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">Desenvolvimento de Banco de Dados</h4>
+                    <p class="text-gray-400 text-sm mb-4">Modelagem e otimização de bancos de dados SQL e NoSQL escaláveis.</p>
+                    <button type="button" class="service-open text-nexus-primary text-sm font-semibold hover:text-white flex items-center gap-1">Saiba mais <i class="fa-solid fa-arrow-right text-xs"></i></button>
+                </div>
+
+                    <div class="service-card bg-nexus-card p-8 rounded-xl border border-gray-800 hover:border-nexus-primary transition-all hover:-translate-y-2 group animate-on-scroll" data-delay="200" role="button" tabindex="0" data-service-name="Criação de APIs" data-service-desc="Desenvolvimento de APIs RESTful e GraphQL para integração de sistemas e serviços web." data-responsible-name="Daniel" data-responsible-email="nexustinfo@gmail.com" data-responsible-options="Daniel|nexustinfo@gmail.com">
+                    <div class="w-14 h-14 bg-blue-900/50 rounded-lg flex items-center justify-center mb-6 group-hover:bg-nexus-primary transition-colors">
+                        <i class="fa-solid fa-code text-nexus-primary text-2xl group-hover:text-white"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">Criação de APIs</h4>
+                    <p class="text-gray-400 text-sm mb-4">APIs RESTful e GraphQL para integração de sistemas e serviços web.</p>
+                    <button type="button" class="service-open text-nexus-primary text-sm font-semibold hover:text-white flex items-center gap-1">Saiba mais <i class="fa-solid fa-arrow-right text-xs"></i></button>
+                </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="py-12 border-y border-gray-800 bg-nexus-dark">
+        <section class="py-12 border-y border-gray-800 bg-nexus-dark overflow-hidden">
+            <div class="w-full mx-auto px-1">
+                <div class="relative w-full">
+                    <style>
+                        /* Infinite carousel: duplicate group technique for seamless loop */
+                        .carousel { overflow: hidden; position: relative; padding-block: 0.85rem; }
+                        :root { --carousel-duration: 18s; }
+                        @keyframes carousel-infinite {
+                            0% { transform: translateX(0); }
+                            100% { transform: translateX(-50%); }
+                        }
+                        .carousel-track {
+                            display: flex;
+                            gap: 0; /* groups are adjacent */
+                            align-items: center;
+                            animation: carousel-infinite var(--carousel-duration) linear infinite;
+                            will-change: transform;
+                            width: max-content; /* grow to content width so translateX(-50%) moves exactly one duplicated half */
+                            flex-wrap: nowrap;
+                        }
+                        .carousel-track:hover,
+                        .carousel:focus-within .carousel-track { animation-play-state: paused; }
+
+                        /* Ensure each duplicated group is at least viewport width so there is no blank gap */
+                        .carousel-group { display:flex; gap: 6rem; justify-content: flex-start; align-items: center; flex-shrink: 0; padding-inline: 6vw; }
+
+                        /* Typography & visual polish */
+                        /* Tech-style, smaller sizes */
+                        .carousel-item { display:inline-block; padding: 0 0.5rem; white-space: nowrap; font-weight: 700; font-size: 1.125rem; line-height: 1; letter-spacing: 0.06em; text-transform: uppercase; color: transparent; background: linear-gradient(90deg,#38bdf8 0%, #06b6d4 100%); -webkit-background-clip: text; background-clip: text; text-wrap: nowrap; transform: translateZ(0); font-family: 'SFMono-Regular', ui-monospace, Menlo, Monaco, 'Roboto Mono', 'Segoe UI Mono', Inter, system-ui, -apple-system, Roboto, Arial; }
+                        @media (min-width: 768px) { .carousel-item { font-size: 1.5rem; } }
+                        @media (min-width: 1024px) { .carousel-item { font-size: 2rem; } }
+
+                        /* Subtle float animation to add life without being distracting */
+                        @keyframes float-up { 0% { transform: translateZ(0) translateY(0); } 50% { transform: translateZ(0) translateY(-2px); } 100% { transform: translateZ(0) translateY(0); } }
+                        .carousel-item { animation: float-up 6s ease-in-out infinite; }
+
+                        /* modern hover & focus micro-interactions */
+                        .carousel-item { transition: transform .28s cubic-bezier(.2,.9,.2,1), opacity .28s ease, filter .28s ease; }
+                        .carousel-item:hover, .carousel-item:focus { transform: translateY(-4px) scale(1.01); opacity: 1; filter: drop-shadow(0 6px 18px rgba(6,78,213,0.08)); }
+
+                        /* Fade mask on edges for nicer transition */
+                        .carousel-fade { position: absolute; top: 0; bottom: 0; width: 10vw; pointer-events: none; z-index: 10; }
+                        .carousel-fade.left { left: 0; background: linear-gradient(to right, rgba(17,24,39,1), rgba(17,24,39,0)); }
+                        .carousel-fade.right { right: 0; background: linear-gradient(to left, rgba(17,24,39,1), rgba(17,24,39,0)); }
+
+                        /* Respect reduced motion preferences */
+                        @media (prefers-reduced-motion: reduce) { .carousel-track { animation: none; } .carousel-item { transition: none; animation: none; } }
+                    </style>
+                    <div class="carousel" role="list" aria-label="Valores da empresa">
+                        <div class="carousel-fade left" aria-hidden="true"></div>
+                        <div class="carousel-fade right" aria-hidden="true"></div>
+                        <div class="carousel-track">
+                            <div class="carousel-group" role="list">
+                                <div class="carousel-item" role="listitem">Inovação</div>
+                                <div class="carousel-item" role="listitem">Qualidade</div>
+                                <div class="carousel-item" role="listitem">Atenção</div>
+                                <div class="carousel-item" role="listitem">Dedicação</div>
+                                <div class="carousel-item" role="listitem">Empenho</div>
+                                <div class="carousel-item" role="listitem">Confiabilidade</div>
+                                <div class="carousel-item" role="listitem">Segurança</div>
+                                <div class="carousel-item" role="listitem">Eficiência</div>
+                                <div class="carousel-item" role="listitem">Performance</div>
+                                <div class="carousel-item" role="listitem">Escalabilidade</div>
+                                <div class="carousel-item" role="listitem">Resiliência</div>
+                                <div class="carousel-item" role="listitem">Agilidade</div>
+                                <div class="carousel-item" role="listitem">Transparência</div>
+                                <div class="carousel-item" role="listitem">Compromisso</div>
+                            </div>
+                            <!-- duplicated group for seamless loop (aria-hidden for screen readers) -->
+                            <div class="carousel-group" aria-hidden="true">
+                                <div class="carousel-item">Inovação</div>
+                                <div class="carousel-item">Qualidade</div>
+                                <div class="carousel-item">Atenção</div>
+                                <div class="carousel-item">Dedicação</div>
+                                <div class="carousel-item">Empenho</div>
+                                <div class="carousel-item">Confiabilidade</div>
+                                <div class="carousel-item">Segurança</div>
+                                <div class="carousel-item">Eficiência</div>
+                                <div class="carousel-item">Performance</div>
+                                <div class="carousel-item">Escalabilidade</div>
+                                <div class="carousel-item">Resiliência</div>
+                                <div class="carousel-item">Agilidade</div>
+                                <div class="carousel-item">Transparência</div>
+                                <div class="carousel-item">Compromisso</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+       
+ 
+
+    <section id="contato" class="py-20 bg-nexus-card relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-nexus-primary/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
+        
+            <div class="max-w-4xl mx-auto px-4 relative z-10 text-center">
+            <h2 class="text-3xl md:text-5xl font-bold mb-6 animate-on-scroll" data-delay="0">Pronto para modernizar sua TI?</h2>
+            <p class="text-gray-400 mb-10 text-lg animate-on-scroll" data-delay="80">Agende uma consultoria gratuita de 30 minutos com nossos arquitetos de soluções.</p>
+            
+            <form id="contact-form" class="max-w-md mx-auto space-y-4 text-left bg-nexus-dark p-8 rounded-xl border border-gray-700 shadow-2xl animate-on-scroll" data-delay="160">
+                <div id="contact-email-group">
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Email Corporativo</label>
+                    <input id="contact-email" type="email" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-nexus-primary transition-colors" placeholder="seu@email.com">
+                    <p id="error-email" class="form-error">Por favor, insira um email válido.</p>
+                </div>
+                <div id="contact-subject-group">
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Assunto</label>
+                    <input id="contact-subject" type="text" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-nexus-primary transition-colors" placeholder="Assunto da sua mensagem">
+                    <p id="error-subject" class="form-error">O assunto não pode ficar vazio.</p>
+                </div>
+                <!-- Hidden field to store the selected specialist name and recipient email from the team modal for backend/analytics -->
+                <input type="hidden" id="contact-specialist" name="contact-specialist" value="">
+                <input type="hidden" id="contact-recipient" name="contact-recipient" value="">
+                <div id="contact-message-group">
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Mensagem</label>
+                    <textarea id="contact-message" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-nexus-primary transition-colors" placeholder="Conte-nos como podemos ajudar..."></textarea>
+                    <p id="error-message" class="form-error">A mensagem deve ter pelo menos 20 caracteres.</p>
+                </div>
+                <button id="contact-submit" type="button" class="w-full bg-nexus-primary hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition-all shadow-lg shadow-blue-500/20">
+                    Solicitar Contato
+                </button>
+                <!-- toast-container removed per request -->
+                <!-- CONTACT CONFIRMATION MODAL -->
+                <div id="contact-confirm-overlay" class="hidden fixed inset-0 z-50 bg-black/50 flex items-start justify-center">
+                    <div id="contact-confirm-modal" role="dialog" aria-labelledby="contact-confirm-title" class="mt-24 bg-nexus-dark p-6 rounded-lg max-w-2xl w-full mx-4 border border-gray-700">
+                        <h3 id="contact-confirm-title" class="text-lg font-bold text-white mb-2">Confirmar envio de mensagem</h3>
+                        <div id="contact-confirm-summary" class="text-sm text-gray-300 mb-4 whitespace-pre-wrap"></div>
+                        <div class="flex gap-3 justify-end">
+                            <button id="contact-confirm-site" class="bg-nexus-primary text-white px-4 py-2 rounded">Enviar pelo site</button>
+                            <button id="contact-confirm-client" class="bg-gray-700 text-white px-4 py-2 rounded">Abrir no cliente</button>
+                            <button id="contact-confirm-cancel" class="bg-transparent text-gray-400 px-4 py-2">Cancelar</button>
+                        </div>
+                    </div>
+                        <!-- SUCCESS MODAL FOR CONTACT -->
+                        <div id="contact-success-overlay" class="hidden fixed inset-0 z-50 bg-black/50 flex items-start justify-center">
+                            <div id="contact-success-modal" role="dialog" aria-labelledby="contact-success-title" class="mt-24 bg-nexus-dark p-6 rounded-lg max-w-2xl w-full mx-4 border border-gray-700">
+                                <h3 id="contact-success-title" class="text-lg font-bold text-white mb-2">Mensagem enviada</h3>
+                                <div id="contact-success-message" class="text-sm text-gray-300 mb-4"></div>
+                                <div class="flex gap-3 justify-end">
+                                    <button id="contact-success-close" class="bg-nexus-primary text-white px-4 py-2 rounded">Fechar</button>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+                <p class="text-xs text-center text-gray-500 mt-4">Não enviamos spam. Seus dados estão seguros.</p>
+            </form>
+        </div>
+    </section>
+
+    <footer class="bg-nexus-dark pt-16 pb-8 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="col-span-1 md:col-span-1 animate-on-scroll" data-delay="0">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="fa-solid fa-network-wired text-nexus-primary text-xl"></i>
+                        <span class="font-bold text-lg">NEXUS IT</span>
+                    </div>
+                    <p class="text-gray-500 text-sm">Transformando complexidade em eficiência através da tecnologia.</p>
+                </div>
+                
+                <div class="animate-on-scroll" data-delay="80">
+                    <h4 class="text-white font-bold mb-4">Empresa</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-nexus-primary transition-colors">Sobre Nós</a></li>
+                        <li><a href="#" class="hover:text-nexus-primary transition-colors">Carreiras</a></li>
+                        <li><a href="#" class="hover:text-nexus-primary transition-colors">Parceiros</a></li>
+                    </ul>
+                </div>
+
+                <div class="animate-on-scroll" data-delay="160">
+                    <h4 class="text-white font-bold mb-4">Soluções</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-nexus-primary transition-colors">Manutenção de Eletronicos</a></li>
+                        <li><a href="#" class="hover:text-nexus-primary transition-colors">Ajuda Digital</a></li>
+                        <li><a href="#" class="hover:text-nexus-primary transition-colors">Programação</a></li>
+                        <li><a href="#" class="hover:text-nexus-primary transition-colors">Banco de Dados</a></li>
+                    </ul>
+                </div>
+
+                <div class="animate-on-scroll" data-delay="240">
+                    <h4 class="text-white font-bold mb-4">Contato</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><i class="fa-solid fa-envelope mr-2"></i> nexustinfo@gmail.com</li>
+                        <li><i class="fa-solid fa-phone mr-2"></i> (54) 99679-3122</li>
+                        <li><i class="fa-solid fa-location-dot mr-2"></i> Ibirubá, RS</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-gray-600 text-sm">© 2025 Nexus IT Solutions. Todos os direitos reservados.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-500 hover:text-white transition-colors"><i class="fa-brands fa-linkedin text-xl"></i></a>
+                    <a href="https://www.instagram.com/nexustinfo/" class="text-gray-500 hover:text-white transition-colors"><i class="fa-brands fa-instagram text-xl"></i></a>
+                    <a href="#" class="text-gray-500 hover:text-white transition-colors"><i class="fa-brands fa-twitter text-xl"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script: ativa animações de entrada (load) e de rolagem (IntersectionObserver) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Configuração EmailJS (valores reais já inseridos acima)
+            var EMAILJS_PUBLIC_KEY = "XN0ZyQZH95LNf8TOU";
+            var EMAILJS_SERVICE_ID = "service_1k96fdj";
+            var EMAILJS_TEMPLATE_ID = "template_jl3z1nj";
+            // Considera configurado se todos os valores são não-vazios
+            var EMAILJS_CONFIGURED = Boolean(EMAILJS_PUBLIC_KEY && EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID);
+            
+            // Inicializar EmailJS apenas se configurado
+            if (EMAILJS_CONFIGURED && typeof emailjs !== 'undefined') {
+                try {
+                    emailjs.init(EMAILJS_PUBLIC_KEY);
+                    console.log('EmailJS inicializado com sucesso');
+                } catch (e) {
+                    console.warn('Erro ao inicializar EmailJS:', e);
+                }
+            } else {
+                console.warn('EmailJS não configurado. Configure as chaves em index.html (linhas ~586-588)');
+            }
+            
+            // Entrance animations (staggered by data-delay)
+            document.querySelectorAll('.animate-on-load').forEach(function (el) {
+                var delay = el.dataset.delay ? parseInt(el.dataset.delay, 10) : 0;
+                el.style.transitionDelay = (delay / 1000) + 's';
+                setTimeout(function () { el.classList.add('visible'); }, 20 + delay);
+            });
+
+            // Scroll animations
+            // Respect user's reduced motion preference
+            var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (prefersReduced) {
+                document.querySelectorAll('.animate-on-scroll').forEach(function (el) { el.classList.add('in-view'); });
+            } else {
+                var io = new IntersectionObserver(function (entries) {
+                    entries.forEach(function (entry) {
+                        var el = entry.target;
+                        var delay = el.dataset.delay ? parseInt(el.dataset.delay, 10) : 0;
+                        el.style.transitionDelay = (delay / 1000) + 's';
+                        if (entry.isIntersecting) {
+                            el.classList.add('in-view');
+                        } else {
+                            // Toggle off when scrolled out so reveal happens on re-entry
+                            el.classList.remove('in-view');
+                        }
+                    });
+                }, { root: null, rootMargin: '0px 0px -12% 0px', threshold: 0.08 });
+
+                document.querySelectorAll('.animate-on-scroll').forEach(function (el) { io.observe(el); });
+            }
+
+            // Modal de integrante: abrir/fechar e popular conteúdo
+            var modalOverlay = document.createElement('div');
+            modalOverlay.id = 'member-modal-overlay';
+            modalOverlay.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center z-50';
+            modalOverlay.innerHTML = `
+                <div id="member-modal" class="bg-nexus-dark text-gray-100 max-w-6xl w-full mx-4 rounded-xl shadow-2xl overflow-hidden transform transition-all duration-300 scale-95 opacity-0" role="dialog" aria-modal="true" aria-labelledby="member-modal-title">
+                    <div class="flex justify-end p-4">
+                        <button id="member-modal-close" class="text-gray-300 hover:text-white text-2xl" aria-label="Fechar">&times;</button>
+                    </div>
+                    <div class="md:grid md:grid-cols-2 md:gap-0 items-stretch">
+                        <div class="photo-panel relative md:h-[36rem] w-full overflow-hidden bg-black/40">
+                            <img id="member-modal-photo" src="" alt="Foto do integrante" class="w-full h-full object-cover" />
+                            <img id="member-modal-signature" src="" alt="Assinatura" class="signature-overlay" aria-hidden="true" onerror="this.style.display='none'" />
+                        </div>
+                        <div class="px-6 pb-8 pt-6 md:pt-8 md:pb-8 overflow-auto">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h3 id="member-modal-title" class="text-3xl font-extrabold mb-1 text-blue-500 tracking-wide">Nome</h3>
+                                    <div id="member-modal-role" class="uppercase text-xs font-bold text-gray-400 mb-3">Cargo</div>
+                                </div>
+                            </div>
+                            <div id="member-modal-desc" class="text-sm text-gray-400 mb-4">Descrição</div>
+                            <p id="member-modal-bio" class="text-gray-300 mb-4">Biografia do integrante...</p>
+                            <div id="member-modal-education" class="text-sm text-gray-400 mb-6">Formação e certificações.</div>
+                            <div class="mt-6">
+                                <button id="member-modal-schedule" class="bg-nexus-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all shadow">Agendar conversa</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+
+            document.body.appendChild(modalOverlay);
+
+            var modal = document.getElementById('member-modal');
+            var modalClose = document.getElementById('member-modal-close');
+
+            var lastScheduledMemberName = '';
+
+            function openMemberModal(card) {
+                var name = (card.dataset.name || '').trim();
+                var role = (card.dataset.role || '').trim();
+                var bio = (card.dataset.bio || '').trim();
+                var education = (card.dataset.education || '').trim();
+                var photo = card.dataset.photo || '';
+                // fallback to the small image inside the card if data-photo isn't set or points to a missing file
+                if (!photo) {
+                    var cardImg = card.querySelector('img');
+                    if (cardImg && cardImg.src) photo = cardImg.src;
+                }
+
+                document.getElementById('member-modal-title').textContent = name;
+                document.getElementById('member-modal-role').textContent = role;
+                document.getElementById('member-modal-bio').textContent = bio;
+                document.getElementById('member-modal-education').textContent = education;
+                var img = document.getElementById('member-modal-photo');
+                img.src = photo || 'https://via.placeholder.com/300?text=Foto';
+                img.alt = name ? ('Foto de ' + name) : 'Foto do integrante';
+                // populate the signature image if the card has a 'data-signature' attribute
+                try {
+                    var modalSig = document.getElementById('member-modal-signature');
+                    var sigSrc = (card.dataset.signature || '').trim();
+                    if (modalSig) {
+                        if (sigSrc) { modalSig.src = sigSrc; modalSig.style.display = ''; }
+                        else { modalSig.style.display = 'none'; }
+                    }
+                } catch (e) {}
+                // set the modal description from the card
+                var descEl = document.getElementById('member-modal-desc');
+                var description = (card.dataset.description || '').trim();
+                if (descEl) descEl.textContent = description || '';
+
+                // Update the schedule button text for clarity: "Agendar conversa com [Nome]"
+                var scheduleBtn = document.getElementById('member-modal-schedule');
+                if (scheduleBtn) {
+                    scheduleBtn.textContent = 'Agendar conversa' + (name ? ' com ' + name : '');
+                    // store the member name on the button for quick access
+                    scheduleBtn.dataset.memberName = name;
+                    scheduleBtn.setAttribute('aria-label', 'Agendar conversa com ' + (name || 'nosso especialista'));
+                    // store the member email if available so schedule click can set the recipient
+                    scheduleBtn.dataset.memberEmail = card.dataset.email || card.dataset.memberEmail || '';
+                }
+
+                // remember last focused element to restore focus on close
+                modalOverlay._lastFocused = card;
+                modalOverlay.classList.remove('hidden');
+                // animate in (use CSS class)
+                setTimeout(function () { modalOverlay.querySelector('#member-modal').classList.add('open'); }, 10);
+                // disable background scroll
+                document.documentElement.style.overflow = 'hidden';
+                document.body.style.overflow = 'hidden';
+                modalClose.focus();
+                // attach click handler on modal photo to open viewer
+                try {
+                    var modalImgEl = document.getElementById('member-modal-photo');
+                    if (modalImgEl) {
+                        modalImgEl.style.cursor = 'zoom-in';
+                        modalImgEl.onclick = function (e) { e.stopPropagation(); openMemberPhotoViewer(this.src, (card.dataset.signature || '').trim()); };
+                    }
+                } catch (e) {}
+            }
+
+            function closeMemberModal() {
+                var dialog = modalOverlay.querySelector('#member-modal');
+                dialog.classList.remove('open');
+                setTimeout(function () {
+                    modalOverlay.classList.add('hidden');
+                    document.documentElement.style.overflow = '';
+                    document.body.style.overflow = '';
+                    // restore focus to the previously focused card
+                    if (modalOverlay._lastFocused && typeof modalOverlay._lastFocused.focus === 'function') {
+                        modalOverlay._lastFocused.focus();
+                        modalOverlay._lastFocused = null;
+                    }
+                    try { var modalImgEl = document.getElementById('member-modal-photo'); if (modalImgEl) modalImgEl.onclick = null; } catch (e) {}
+                }, 240);
+            }
+
+            // Photo viewer overlay for enlarged modal photo
+            function openMemberPhotoViewer(src, signatureSrc) {
+                if (!src) return;
+                var exist = document.getElementById('member-photo-viewer-overlay');
+                if (!exist) {
+                    var viewer = document.createElement('div');
+                    viewer.id = 'member-photo-viewer-overlay';
+                    viewer.className = 'fixed inset-0 bg-black/90 flex items-center justify-center z-60 hidden';
+                    viewer.innerHTML = '<div class="relative max-w-6xl w-full mx-4 touch-none"><button id="member-photo-viewer-close" aria-label="Fechar" class="absolute z-70 right-2 top-2 text-white text-2xl cursor-pointer">&times;</button><div class="viewer-frame overflow-hidden rounded-xl"><div id="viewer-img-wrap" class="viewer-img-wrap w-full h-full touch-pan-x touch-pan-y" style="touch-action:none; -ms-touch-action:none;"><img id="member-photo-viewer-img" src="" alt="Foto expandida" class="viewer-img w-full h-auto max-h-[90vh] object-contain" /></div><img id="member-photo-viewer-signature" src="" class="signature-overlay" aria-hidden="true" onerror="this.style.display=\'none\'" /></div></div>';
+                    document.body.appendChild(viewer);
+                    // attach close handler
+                    viewer.addEventListener('click', function (e) { if (e.target === viewer || e.target.id === 'member-photo-viewer-close') { viewer.classList.add('hidden'); document.documentElement.style.overflow = ''; document.body.style.overflow = ''; resetViewerTransforms(); } });
+                    // ESC to close
+                    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { try { var v = document.getElementById('member-photo-viewer-overlay'); if (v && !v.classList.contains('hidden')) { v.classList.add('hidden'); document.documentElement.style.overflow = ''; document.body.style.overflow = ''; resetViewerTransforms(); } } catch (e) {} } });
+                }
+                var overlay = document.getElementById('member-photo-viewer-overlay');
+                var img = document.getElementById('member-photo-viewer-img');
+                var sig = document.getElementById('member-photo-viewer-signature');
+                if (img) img.src = src;
+                if (sig) {
+                    if (signatureSrc) { sig.src = signatureSrc; sig.style.display = ''; }
+                    else { sig.style.display = 'none'; }
+                }
+                if (overlay) {
+                    overlay.classList.remove('hidden');
+                    // set system scroll to hidden while open
+                    document.documentElement.style.overflow = 'hidden';
+                    document.body.style.overflow = 'hidden';
+                }
+                // setup gesture handlers for this viewer (only once)
+                try {
+                    setupViewerGestures();
+                } catch (e) {}
+            }
+
+            function setupViewerGestures() {
+                var overlay = document.getElementById('member-photo-viewer-overlay');
+                if (!overlay) return;
+                if (overlay._gesturesAdded) return; overlay._gesturesAdded = true;
+                var imgWrap = document.getElementById('viewer-img-wrap');
+                var img = document.getElementById('member-photo-viewer-img');
+                if (!imgWrap || !img) return;
+
+                // state
+                var state = {
+                    pointers: {},
+                    pointerCount: 0,
+                    startDistance: 0,
+                    startScale: 1,
+                    scale: 1,
+                    minScale: 1,
+                    maxScale: 3,
+                    startX: 0,
+                    startY: 0,
+                    translateX: 0,
+                    translateY: 0,
+                    lastTap: 0,
+                };
+
+                function getDistance(p1, p2) { var dx = p2.clientX - p1.clientX; var dy = p2.clientY - p1.clientY; return Math.sqrt(dx*dx + dy*dy); }
+                function getCenter(p1, p2) { return { x: (p1.clientX + p2.clientX) / 2, y: (p1.clientY + p2.clientY) / 2 }; }
+
+                function setTransform() {
+                    imgWrap.style.transform = 'translate(' + state.translateX + 'px, ' + state.translateY + 'px) scale(' + state.scale + ')';
+                }
+
+                function clampTransforms() {
+                    // optional clamp to container so the image doesn't slide fully away; simple clamp strategy.
+                    try {
+                        var wrapRect = imgWrap.getBoundingClientRect();
+                        var overlayRect = overlay.getBoundingClientRect();
+                        var imgRect = img.getBoundingClientRect();
+                        var scaledW = imgRect.width * state.scale;
+                        var scaledH = imgRect.height * state.scale;
+                        // compute allowed translation bounds (so edges not too far off-screen)
+                        var minX = Math.min(0, (overlayRect.width - scaledW) / 2);
+                        var maxX = Math.max(0, (scaledW - overlayRect.width) / 2);
+                        var minY = Math.min(0, (overlayRect.height - scaledH) / 2);
+                        var maxY = Math.max(0, (scaledH - overlayRect.height) / 2);
+                        // clamp
+                        if (state.translateX < -maxX) state.translateX = -maxX;
+                        if (state.translateX > maxX) state.translateX = maxX;
+                        if (state.translateY < -maxY) state.translateY = -maxY;
+                        if (state.translateY > maxY) state.translateY = maxY;
+                    } catch (e) {}
+                }
+
+                function resetViewerTransforms() {
+                    state.scale = 1; state.translateX = 0; state.translateY = 0; state.startScale = 1;
+                    setTransform();
+                }
+                // expose for close logic
+                window.resetViewerTransforms = resetViewerTransforms;
+
+                // pointer handlers
+                var active = false;
+                overlay.addEventListener('pointerdown', onPointerDown, { passive: false });
+                overlay.addEventListener('pointermove', onPointerMove, { passive: false });
+                overlay.addEventListener('pointerup', onPointerUp); overlay.addEventListener('pointercancel', onPointerUp);
+                overlay.addEventListener('wheel', onWheel, { passive: false });
+
+                function onPointerDown(e) {
+                    overlay.setPointerCapture && overlay.setPointerCapture(e.pointerId);
+                    state.pointers[e.pointerId] = e;
+                    state.pointerCount = Object.keys(state.pointers).length;
+                    if (state.pointerCount === 1) {
+                        // single pointer: start pan
+                        state.startX = e.clientX; state.startY = e.clientY; state.startTranslateX = state.translateX; state.startTranslateY = state.translateY;
+                        // double-tap detection
+                        var now = Date.now(); if (now - state.lastTap < 300) {
+                            // double tap => toggle zoom
+                            if (state.scale > 1) { state.scale = 1; state.translateX = 0; state.translateY = 0; }
+                            else { state.scale = 2; }
+                            clampTransforms(); setTransform();
+                        }
+                        state.lastTap = now;
+                    } else if (state.pointerCount === 2) {
+                        // pinch start
+                        var ids = Object.keys(state.pointers);
+                        var p1 = state.pointers[ids[0]]; var p2 = state.pointers[ids[1]];
+                        state.startDistance = getDistance(p1, p2);
+                        state.startScale = state.scale || 1;
+                        // compute center for correct translate adjustments
+                        var center = getCenter(p1, p2); state.centerX = center.x; state.centerY = center.y;
+                    }
+                    e.preventDefault();
+                }
+
+                function onPointerMove(e) {
+                    if (!state.pointers[e.pointerId]) return;
+                    state.pointers[e.pointerId] = e;
+                    var count = Object.keys(state.pointers).length;
+                    if (count === 1) {
+                        var dx = e.clientX - state.startX; var dy = e.clientY - state.startY;
+                        state.translateX = state.startTranslateX + dx; state.translateY = state.startTranslateY + dy; clampTransforms(); setTransform();
+                    } else if (count === 2) {
+                        var ids = Object.keys(state.pointers); var p1 = state.pointers[ids[0]]; var p2 = state.pointers[ids[1]];
+                        var dist = getDistance(p1, p2); if (state.startDistance > 0) {
+                            var newScale = state.startScale * (dist / state.startDistance); if (newScale < state.minScale) newScale = state.minScale; if (newScale > state.maxScale) newScale = state.maxScale;
+                            // update translate to keep the focal point under fingers
+                            var center = getCenter(p1, p2);
+                            var deltaCenterX = center.x - state.centerX; var deltaCenterY = center.y - state.centerY; // small offset
+                            // compute new translate temporarily
+                            state.scale = newScale; clampTransforms(); setTransform();
+                        }
+                    }
+                    e.preventDefault();
+                }
+
+                function onPointerUp(e) {
+                    delete state.pointers[e.pointerId]; state.pointerCount = Object.keys(state.pointers).length; if (state.pointerCount === 0) {
+                        // store final translate values (already in state)
+                    }
+                }
+
+                // wheel zoom center at cursor
+                function onWheel(e) {
+                    e.preventDefault(); var delta = (e.deltaY || e.wheelDelta || -e.detail);
+                    var zoomFactor = 1 - (delta / 1000); var newScale = state.scale * zoomFactor;
+                    if (newScale < state.minScale) newScale = state.minScale; if (newScale > state.maxScale) newScale = state.maxScale;
+                    // adjust translate to zoom towards cursor
+                    var rect = overlay.getBoundingClientRect(); var cx = e.clientX - rect.left - rect.width / 2; var cy = e.clientY - rect.top - rect.height / 2;
+                    state.scale = newScale; clampTransforms(); setTransform();
+                }
+
+                // Reset on open/close
+                resetViewerTransforms();
+            }
+
+            // Service modal creation and references
+            var serviceModalOverlay = document.createElement('div');
+            serviceModalOverlay.id = 'service-modal-overlay';
+            serviceModalOverlay.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center z-50';
+            serviceModalOverlay.innerHTML = `
+                <div id="service-modal" class="bg-nexus-dark text-gray-100 max-w-3xl w-full mx-4 rounded-xl shadow-2xl overflow-hidden transform transition-all duration-300 scale-95 opacity-0" role="dialog" aria-modal="true" aria-labelledby="service-modal-title">
+                    <div class="flex justify-end p-4">
+                        <button id="service-modal-close" class="text-gray-300 hover:text-white text-2xl" aria-label="Fechar">&times;</button>
+                    </div>
+                    <div class="px-6 pb-8 pt-0">
+                        <div class="mb-4">
+                            <h3 id="service-modal-title" class="text-2xl font-bold mb-1">Serviço</h3>
+                            <div id="service-modal-desc" class="text-sm text-gray-400 mb-4">Descrição do serviço</div>
+                        </div>
+                        <div class="mb-4 text-sm text-gray-300">
+                            <div>Responsável: <strong id="service-modal-responsible">Nome</strong> <span id="service-modal-responsible-email" class="text-xs text-gray-400 ml-2"></span></div>
+                        </div>
+                        <div id="service-recipient-wrap" class="mb-4 hidden">
+                            <label for="service-recipient" class="block text-sm text-gray-300 mb-1">Escolha o técnico</label>
+                            <select id="service-recipient" class="w-full bg-nexus-dark border border-gray-700 rounded px-3 py-2 text-sm text-white">
+                            </select>
+                            <p id="service-recipient-note" class="text-xs text-gray-400 mt-1"></p>
+                        </div>
+                        <form id="service-modal-form" class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div id="service-email-group" class="">
+                                    <label class="block text-sm text-gray-300 mb-1">Seu email</label>
+                                    <input id="service-email" type="email" class="w-full bg-nexus-dark border border-gray-700 rounded px-3 py-2 text-sm" placeholder="seu@exemplo.com" required />
+                                    <div id="service-error-email" class="text-xs text-red-500 mt-1"></div>
+                                </div>
+                                <div id="service-subject-group" class="">
+                                    <label class="block text-sm text-gray-300 mb-1">Assunto</label>
+                                    <input id="service-subject" type="text" class="w-full bg-nexus-dark border border-gray-700 rounded px-3 py-2 text-sm" placeholder="Assunto" required />
+                                    <div id="service-error-subject" class="text-xs text-red-500 mt-1"></div>
+                                </div>
+                            </div>
+                            <div id="service-message-group">
+                                <label class="block text-sm text-gray-300 mb-1">Mensagem</label>
+                                <textarea id="service-message" class="w-full bg-nexus-dark border border-gray-700 rounded px-3 py-2 text-sm" rows="4" placeholder="Descreva seu problema ou solicitação"></textarea>
+                                <div id="service-error-message" class="text-xs text-red-500 mt-1"></div>
+                            </div>
+                            <div class="flex gap-3 items-center">
+                                <button id="service-send" type="button" class="bg-nexus-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all">Enviar para responsável</button>
+                                <button id="service-cancel" type="button" class="text-gray-300 hover:text-white text-sm">Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>`;
+            document.body.appendChild(serviceModalOverlay);
+            var serviceModal = document.getElementById('service-modal');
+            var serviceModalClose = document.getElementById('service-modal-close');
+            var serviceRecipientWrap = document.getElementById('service-recipient-wrap');
+            var serviceRecipientSelect = document.getElementById('service-recipient');
+            var serviceRecipientNote = document.getElementById('service-recipient-note');
+
+            // attach click/keyboard handlers to cards
+            document.querySelectorAll('.member-card').forEach(function (card) {
+                // set optional signature overlay image if dataset provided
+                try {
+                    var sig = card.querySelector('.signature-overlay');
+                    var signatureSrc = (card.dataset.signature || '').trim();
+                    if (sig) {
+                        if (signatureSrc) { sig.src = signatureSrc; sig.style.display = ''; }
+                        else { sig.style.display = 'none'; }
+                    }
+                } catch (e) {}
+
+                card.addEventListener('click', function () { openMemberModal(card); });
+                card.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openMemberModal(card); } });
+            });
+
+            // add openServiceModal / closeServiceModal functions
+            function openServiceModal(card) {
+                var serviceName = (card.dataset.serviceName || '').trim();
+                var serviceDesc = (card.dataset.serviceDesc || '').trim();
+                var responsible = (card.dataset.responsibleName || '').trim();
+                var responsibleEmail = (card.dataset.responsibleEmail || '').trim();
+                var optionsRaw = (card.dataset.responsibleOptions || '').trim();
+                var parsedOptions = [];
+                if (optionsRaw) {
+                    optionsRaw.split(';').forEach(function (pair) {
+                        var parts = pair.split('|');
+                        if (parts.length >= 2) {
+                            var name = (parts[0] || '').trim();
+                            var email = (parts[1] || '').trim();
+                            if (name && validateEmail(email)) { parsedOptions.push({ name: name, email: email }); }
+                        }
+                    });
+                }
+                if (!parsedOptions.length && responsible && validateEmail(responsibleEmail)) {
+                    parsedOptions.push({ name: responsible, email: responsibleEmail });
+                }
+
+                function setRecipient(name, email) {
+                    document.getElementById('service-modal-responsible').textContent = name || 'Responsável';
+                    document.getElementById('service-modal-responsible-email').textContent = email ? ('<' + email + '>') : '';
+                    serviceModalOverlay.dataset.responsibleEmail = email || '';
+                }
+
+                if (parsedOptions.length > 1 && serviceRecipientWrap && serviceRecipientSelect) {
+                    serviceRecipientWrap.classList.remove('hidden');
+                    serviceRecipientSelect.innerHTML = '';
+                    parsedOptions.forEach(function (opt, idx) {
+                        var optionEl = document.createElement('option');
+                        optionEl.value = opt.email;
+                        optionEl.textContent = opt.name + ' (' + opt.email + ')';
+                        optionEl.dataset.name = opt.name;
+                        serviceRecipientSelect.appendChild(optionEl);
+                        if (idx === 0) { serviceRecipientSelect.value = opt.email; }
+                    });
+                    var combinedEmails = parsedOptions.map(function (o) { return o.email; }).join(',');
+                    var bothOption = document.createElement('option');
+                    bothOption.value = combinedEmails;
+                    bothOption.textContent = 'Enviar para todos';
+                    bothOption.dataset.name = parsedOptions.map(function (o) { return o.name; }).join(' e ');
+                    serviceRecipientSelect.appendChild(bothOption);
+                    if (serviceRecipientNote) serviceRecipientNote.textContent = 'Selecione um técnico ou envie para todos os responsáveis.';
+                    var firstOpt = parsedOptions[0];
+                    setRecipient(firstOpt.name, firstOpt.email);
+                    serviceRecipientSelect.onchange = function () {
+                        var selected = serviceRecipientSelect.options[serviceRecipientSelect.selectedIndex];
+                        var name = (selected && selected.dataset && selected.dataset.name) ? selected.dataset.name : firstOpt.name;
+                        var email = serviceRecipientSelect.value;
+                        setRecipient(name, email);
+                        var msgInput = document.getElementById('service-message');
+                        if (msgInput) msgInput.value = 'Olá ' + (name || '') + ',\n\nDescrevo minha solicitação relativa ao serviço ' + (serviceName || '') + '.';
+                    };
+                } else {
+                    if (serviceRecipientWrap) serviceRecipientWrap.classList.add('hidden');
+                    if (serviceRecipientNote) serviceRecipientNote.textContent = '';
+                    if (serviceRecipientSelect) serviceRecipientSelect.onchange = null;
+                    setRecipient(responsible, responsibleEmail);
+                }
+
+                document.getElementById('service-modal-title').textContent = serviceName || 'Serviço';
+                document.getElementById('service-modal-desc').textContent = serviceDesc || '';
+                serviceModalOverlay.dataset.serviceName = serviceName || '';
+                serviceModalOverlay._lastFocused = card;
+                serviceModalOverlay.classList.remove('hidden');
+                setTimeout(function () { serviceModal.classList.add('open'); }, 10);
+                document.documentElement.style.overflow = 'hidden';
+                document.body.style.overflow = 'hidden';
+                serviceModalClose.focus();
+                var subjInput = document.getElementById('service-subject');
+                var msgInput = document.getElementById('service-message');
+                if (subjInput) subjInput.value = 'Solicitação: ' + (serviceName || 'Serviço');
+                var currentResponsible = document.getElementById('service-modal-responsible').textContent || responsible;
+                if (msgInput) msgInput.value = 'Olá ' + (currentResponsible || '') + ',\n\nDescrevo minha solicitação relativa ao serviço ' + (serviceName || '') + '.';
+            }
+
+            function closeServiceModal() {
+                var dialog = serviceModalOverlay.querySelector('#service-modal');
+                dialog.classList.remove('open');
+                setTimeout(function () {
+                    serviceModalOverlay.classList.add('hidden');
+                    document.documentElement.style.overflow = '';
+                    document.body.style.overflow = '';
+                    if (serviceModalOverlay._lastFocused && typeof serviceModalOverlay._lastFocused.focus === 'function') { serviceModalOverlay._lastFocused.focus(); serviceModalOverlay._lastFocused = null; }
+                }, 240);
+            }
+
+            // attach click/keyboard handlers for service cards
+            document.querySelectorAll('.service-card').forEach(function (card) { card.addEventListener('click', function () { openServiceModal(card); }); card.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openServiceModal(card); } }); });
+            document.querySelectorAll('.service-open').forEach(function (btn) { btn.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); var card = btn.closest('.service-card'); if (card) openServiceModal(card); }); btn.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); var card = btn.closest('.service-card'); if (card) openServiceModal(card); } }); });
+
+            // close handlers
+            modalOverlay.addEventListener('click', function (e) { if (e.target === modalOverlay) closeMemberModal(); });
+            serviceModalOverlay.addEventListener('click', function (e) { if (e.target === serviceModalOverlay) closeServiceModal(); });
+            document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeMemberModal(); closeServiceModal(); try { hideConfirmModal(); } catch (e) {} try { var so = document.getElementById('contact-success-overlay'); if (so && !so.classList.contains('hidden')) { so.classList.add('hidden'); document.body.style.overflow = ''; } } catch (e) {} } });
+            document.addEventListener('click', function (e) { if (e.target && e.target.id === 'member-modal-close') closeMemberModal(); if (e.target && (e.target.id === 'service-modal-close' || e.target.id === 'service-cancel')) closeServiceModal(); });
+
+            // Schedule button: close modal and scroll to contact form, focus email
+            document.addEventListener('click', function (e) {
+                if (e.target && e.target.id === 'member-modal-schedule') {
+                    var name = document.getElementById('member-modal-title').textContent || '';
+                    // store last scheduled name so toast and submission reflect it even if the subject changes
+                    lastScheduledMemberName = name;
+                    closeMemberModal();
+                    setTimeout(function () {
+                        var contato = document.getElementById('contato');
+                        if (contato) contato.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        var emailInput = document.querySelector('#contact-email');
+                        if (emailInput) {
+                            emailInput.focus();
+                            // set a helpful placeholder mentioning the member
+                            emailInput.placeholder = 'Seu email — solicitando conversa com ' + (name || 'nosso especialista');
+                        }
+                        // prefill subject + message
+                        var subject = document.getElementById('contact-subject');
+                        var message = document.getElementById('contact-message');
+                        if (subject) subject.value = 'Agendar conversa com ' + (name || 'um especialista');
+                        if (message) message.value = 'Olá, gostaria de agendar uma conversa com ' + (name || 'um especialista') + '. Por favor, informe sua disponibilidade e melhor horário.';
+                            // Set hidden form field for backend usage
+                            var specialistField = document.getElementById('contact-specialist');
+                            if (specialistField) specialistField.value = name || '';
+                            // Set the recipient email field from the schedule button dataset
+                            var scheduleBtnEl = document.getElementById('member-modal-schedule');
+                            var memberEmail = (scheduleBtnEl && scheduleBtnEl.dataset && scheduleBtnEl.dataset.memberEmail) ? scheduleBtnEl.dataset.memberEmail : '';
+                            var recipientField = document.getElementById('contact-recipient');
+                            if (recipientField) recipientField.value = memberEmail || '';
+                    }, 320);
+                }
+            });
+
+            // Contact form validation + submit (client-side simulated)
+            function validateEmail(email) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            }
+
+            // showToast removed from index.html to prevent email confirmation errors
+
+            // Confirmation modal helper (shared between contact + service)
+            var confirmToEmail = '';
+            var confirmSubject = '';
+            var confirmMessage = '';
+            var confirmFrom = '';
+            var confirmOverlay = document.getElementById('contact-confirm-overlay');
+            var confirmSummary = document.getElementById('contact-confirm-summary');
+            var siteBtn = document.getElementById('contact-confirm-site');
+            var clientBtn = document.getElementById('contact-confirm-client');
+            var cancelBtn = document.getElementById('contact-confirm-cancel');
+
+            function showConfirmModal(to, subject, message, from) {
+                confirmToEmail = to || 'nexustinfo@gmail.com';
+                confirmSubject = subject || '';
+                confirmMessage = message || '';
+                confirmFrom = from || '';
+                if (confirmSummary) confirmSummary.textContent = 'Assunto: ' + confirmSubject + '\n\n' + confirmMessage + '\n\nDestinatário: ' + confirmToEmail + '\nEnviado por: ' + confirmFrom;
+                if (confirmOverlay) { confirmOverlay.classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+                // focus primary action for accessibility
+                try { if (siteBtn && typeof siteBtn.focus === 'function') siteBtn.focus(); } catch (e) {}
+            }
+
+            function hideConfirmModal() { if (confirmOverlay) { confirmOverlay.classList.add('hidden'); document.body.style.overflow = ''; } }
+
+            function sendConfirmPayload() {
+                hideConfirmModal();
+                // disable buttons while sending
+                try { if (siteBtn) siteBtn.disabled = true; if (clientBtn) clientBtn.disabled = true; } catch (e) {}
+                
+                // Verificar se EmailJS está configurado
+                if (!EMAILJS_CONFIGURED || typeof emailjs === 'undefined') {
+                    console.warn('EmailJS não configurado. Abrindo cliente de email...');
+                    alert('EmailJS não configurado.\n\nPara configurar:\n1. Acesse https://www.emailjs.com/\n2. Crie uma conta gratuita\n3. Configure as chaves no arquivo index.html\n\nAbrindo seu cliente de email...');
+                    openClientFromConfirm();
+                    try { if (siteBtn) siteBtn.disabled = false; if (clientBtn) clientBtn.disabled = false; } catch (e) {}
+                    return;
+                }
+                
+                // Preparar parâmetros para EmailJS
+                var templateParams = {
+                    from_email: confirmFrom,
+                    to_email: confirmToEmail,
+                    subject: confirmSubject,
+                    message: confirmMessage,
+                    specialist: (document.getElementById('contact-specialist') && document.getElementById('contact-specialist').value) || ''
+                };
+                
+                // Enviar email usando EmailJS
+                // Passar explicitamente a publicKey (EmailJS v4)
+                emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams, { publicKey: EMAILJS_PUBLIC_KEY })
+                .then(function (response) {
+                    console.log('Email enviado com sucesso!', response.status, response.text);
+                    var successOverlay = document.getElementById('contact-success-overlay');
+                    if (successOverlay) {
+                        var successMessage = document.getElementById('contact-success-message');
+                        if (successMessage) successMessage.textContent = 'Mensagem enviada com sucesso! Protocolo: ' + response.text;
+                        successOverlay.classList.remove('hidden');
+                        document.body.style.overflow = 'hidden';
+                    } else { alert('Mensagem enviada com sucesso!'); }
+                    try { document.getElementById('contact-form').reset(); } catch (e) {}
+                }, function (error) {
+                    console.error('Erro ao enviar email:', error);
+                    // Mensagem de ajuda conforme erros comunss
+                    try {
+                        var hint = '';
+                        if (error && (error.status === 403 || /origin/i.test(String(error.text || '')))) {
+                            hint = '\n\nDica: adicione o domínio/origem do seu site em EmailJS (Account → Domains) e verifique a Public Key.';
+                        } else if (error && /service|template/i.test(String(error.text || ''))) {
+                            hint = '\n\nDica: confirme SERVICE_ID e TEMPLATE_ID exatamente como no painel do EmailJS.';
+                        }
+                        if (hint) console.warn(hint);
+                    } catch (e) {}
+                    if (confirm('Falha ao enviar pelo site. Deseja abrir o cliente de e-mail com a mensagem?')) {
+                        var mailtoImmediate = 'mailto:' + encodeURIComponent(confirmToEmail) + '?subject=' + encodeURIComponent(confirmSubject) + '&body=' + encodeURIComponent(confirmMessage + '\n\nContato: ' + confirmFrom);
+                        window.location.href = mailtoImmediate;
+                    } else { 
+                        alert('Houve um erro: ' + (error.text || error.message || 'Erro desconhecido') + '\n\nVerifique se as chaves do EmailJS estão configuradas corretamente.' + (hint || '')); 
+                    }
+                }).finally(function () { 
+                    try { if (siteBtn) siteBtn.disabled = false; if (clientBtn) clientBtn.disabled = false; } catch (e) {} 
+                });
+            }
+
+            function openClientFromConfirm() {
+                hideConfirmModal();
+                var mailtoImmediate = 'mailto:' + encodeURIComponent(confirmToEmail) + '?subject=' + encodeURIComponent(confirmSubject) + '&body=' + encodeURIComponent(confirmMessage + '\n\nContato: ' + confirmFrom);
+                window.location.href = mailtoImmediate;
+            }
+
+            // event handlers for the confirmation modal (registered once)
+            if (siteBtn) siteBtn.addEventListener('click', sendConfirmPayload);
+            if (clientBtn) clientBtn.addEventListener('click', openClientFromConfirm);
+            if (cancelBtn) cancelBtn.addEventListener('click', hideConfirmModal);
+            if (confirmOverlay) confirmOverlay.addEventListener('click', function (e) { if (e.target === confirmOverlay) hideConfirmModal(); });
+            // Success modal close handlers
+            var successOverlay = document.getElementById('contact-success-overlay');
+            if (successOverlay) {
+                var successCloseBtn = document.getElementById('contact-success-close');
+                if (successCloseBtn) successCloseBtn.addEventListener('click', function () { successOverlay.classList.add('hidden'); document.body.style.overflow = ''; });
+                successOverlay.addEventListener('click', function (e) { if (e.target === successOverlay) { successOverlay.classList.add('hidden'); document.body.style.overflow = ''; } });
+            }
+
+            document.getElementById('contact-submit').addEventListener('click', function () {
+                var email = document.getElementById('contact-email').value.trim();
+                var subject = document.getElementById('contact-subject').value.trim();
+                var message = document.getElementById('contact-message').value.trim();
+
+                var valid = true;
+                // reset error states
+                document.getElementById('contact-email-group').classList.remove('has-error');
+                document.getElementById('contact-subject-group').classList.remove('has-error');
+                document.getElementById('contact-message-group').classList.remove('has-error');
+
+                if (!validateEmail(email)) { document.getElementById('contact-email-group').classList.add('has-error'); document.getElementById('error-email').textContent = 'Por favor, insira um email válido.'; valid = false; }
+                if (!subject || subject.length < 3) { document.getElementById('contact-subject-group').classList.add('has-error'); document.getElementById('error-subject').textContent = 'O assunto deve ter ao menos 3 caracteres.'; valid = false; }
+                if (!message || message.length < 20) { document.getElementById('contact-message-group').classList.add('has-error'); document.getElementById('error-message').textContent = 'A mensagem deve ter pelo menos 20 caracteres.'; valid = false; }
+
+                if (!valid) {
+                    // focus first error
+                    if (document.getElementById('contact-email-group').classList.contains('has-error')) { document.getElementById('contact-email').focus(); }
+                    else if (document.getElementById('contact-subject-group').classList.contains('has-error')) { document.getElementById('contact-subject').focus(); }
+                    else document.getElementById('contact-message').focus();
+                    return;
+                }
+
+                // Simulate successful submission and offer to open mail client
+                // Prefer the explicit stored name from the schedule action, otherwise try to infer from subject
+                var specialistField = document.getElementById('contact-specialist');
+                var specialistFromField = (specialistField && specialistField.value) ? specialistField.value.trim() : '';
+                // prefer hidden field if present, then lastScheduledMemberName, then try infer from subject
+                var displayName = specialistFromField || lastScheduledMemberName || subject.replace(/^Agendar conversa com /, '') || 'um especialista';
+                var bodyWithRef = message + '\n\nContato: ' + email + '\n\nReferente a: ' + displayName;
+                // use a recipient email if the contact form was prefilled via schedule
+                var contactRecipient = '';
+                var contactRecipientEl = document.getElementById('contact-recipient');
+                if (contactRecipientEl) contactRecipient = contactRecipientEl.value.trim();
+                var toEmail = validateEmail(contactRecipient) ? contactRecipient : 'nexustinfo@gmail.com';
+                // Open mail client immediately if there's a valid recipient
+                // Instead of opening mailto immediately, show the confirmation modal with options
+                // show confirmation modal and reuse shared confirm handlers
+                showConfirmModal(toEmail || 'nexustinfo@gmail.com', subject, message, email);
+            });
+
+            // Service modal send handler: validate and open mail client to the responsible person
+            document.getElementById('service-send').addEventListener('click', function () {
+                var email = document.getElementById('service-email').value.trim();
+                var subject = document.getElementById('service-subject').value.trim();
+                var message = document.getElementById('service-message').value.trim();
+                var valid = true;
+                document.getElementById('service-email-group').classList.remove('has-error');
+                document.getElementById('service-subject-group').classList.remove('has-error');
+                document.getElementById('service-message-group').classList.remove('has-error');
+                document.getElementById('service-error-email').textContent = '';
+                document.getElementById('service-error-subject').textContent = '';
+                document.getElementById('service-error-message').textContent = '';
+                if (!validateEmail(email)) { document.getElementById('service-email-group').classList.add('has-error'); document.getElementById('service-error-email').textContent = 'Por favor, insira um email válido.'; valid = false; }
+                if (!subject || subject.length < 3) { document.getElementById('service-subject-group').classList.add('has-error'); document.getElementById('service-error-subject').textContent = 'O assunto deve ter ao menos 3 caracteres.'; valid = false; }
+                if (!message || message.length < 20) { document.getElementById('service-message-group').classList.add('has-error'); document.getElementById('service-error-message').textContent = 'A mensagem deve ter pelo menos 20 caracteres.'; valid = false; }
+                if (!valid) { if (document.getElementById('service-email-group').classList.contains('has-error')) { document.getElementById('service-email').focus(); } else if (document.getElementById('service-subject-group').classList.contains('has-error')) { document.getElementById('service-subject').focus(); } else document.getElementById('service-message').focus(); return; }
+                var responsibleEmail = serviceModalOverlay.dataset.responsibleEmail || '';
+                var serviceName = serviceModalOverlay.dataset.serviceName || '';
+                var bodyWithMeta = message + '\n\nContato: ' + email + '\n\nServiço: ' + serviceName + '\nResponsável: ' + (document.getElementById('service-modal-responsible').textContent || '');
+                var recipientList = responsibleEmail.split(',').map(function (item) { return item.trim(); }).filter(function (item) { return validateEmail(item); });
+                var toEmail = recipientList.length ? recipientList.join(',') : 'nexustinfo@gmail.com';
+                // close service modal and show confirmation modal to either POST via backend or open client
+                closeServiceModal();
+                showConfirmModal(toEmail, subject, bodyWithMeta, email);
+            });
+        });
+    </script>
+
+</body>
+</html>
