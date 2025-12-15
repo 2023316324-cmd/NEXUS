@@ -37,9 +37,11 @@ http-server
 
 - `index.html` - Página principal do site
 - `index-nexus.html` - Versão alternativa da página
-- `nexus/` - Diretório com recursos adicionais
-- Imagens: N.png, NEXUS.png, NEXUS-PREVIW.png
+- `nexus/` - Diretório com cópias de recursos (backup)
+- Imagens: n.png, NEXUS.png, NEXUS-PREVIW.png
 - Fotos da equipe: danielc.jpg, felipe.jpg, gustavo.jpeg, iago.jpeg
+
+**Nota:** O diretório `nexus/` contém duplicatas dos arquivos da raiz e pode ser removido se não for necessário.
 
 ## Tecnologias Utilizadas
 
